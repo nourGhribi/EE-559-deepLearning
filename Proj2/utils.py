@@ -21,15 +21,16 @@ def get_data(n = 1000):
     y = norm_squared.sub(radius_sq).sign().add(1).div(2)
     return x, y
 
-def encode_labels(target): 
+def encode_labels(target):
+    """
+    Encode the labels:
+    if 1 -> [0,1]
+    if 0 -> [0,0]
+    """
     encoded = torch.empty(target.shape[0], 2)
-    for i in range(target.shape[0]): 
-        if(target[i]):
-            encoded[i,0] = 0
-            encoded[i,1] = target[i]
-        else : 
-            encoded[i,0] = 1
-            encoded[i,1] = target[i]
+    encoded[:,0].fill_(0)
+    encoded[:,1] = target
     return encoded
 
 def train_model(model, X_train, y_train, X_test, y_test, epochs=100, batch_size=50, loss="MSE", lr="0.05", verbose=True):
+    raise NotImplementedError

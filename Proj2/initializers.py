@@ -5,7 +5,7 @@ from initializer import Initializer
 
 class Xavier(Initializer):
     """
-    Weights initializer using xavier and default unifrom distibution
+    Weights initializer using xavier and default unifrom distibution (else uses normal distribution)
     """
     def __init__(self, fan_in, fan_out, dist = 'uniform'):
         super(Xavier, self).__init__()

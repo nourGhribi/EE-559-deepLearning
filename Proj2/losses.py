@@ -3,7 +3,6 @@ from module import Module
 class LossMSE(Module):
     
     def __init__(self,model):
-        
         super(LossMSE, self).__init__()
         self.prediction = None
         self.target = None
@@ -11,8 +10,8 @@ class LossMSE(Module):
         
     def forward(self, prediction, target):
         """
-        :param prediction:
-        :param target:
+        :param prediction: the predicted values
+        :param target: the true values
         :return: MSE error over the batch size
         """
         self.prediction = prediction
@@ -21,7 +20,6 @@ class LossMSE(Module):
         return batched_error.mean(0)  #take the mean over the batch
     
     def backward(self):
-            
         batchsize = self.prediction.shape[0]
         dMSE = 2*(self.prediction - self.target)/batchsize
         
