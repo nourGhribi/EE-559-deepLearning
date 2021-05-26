@@ -27,13 +27,11 @@ class ShallowModel(nn.Module):
     self.fc = nn.Sequential(Flatten(),
                             nn.Linear( 14*14*2, self.nb_hidden),
                             nn.ReLU(),
-                            nn.Linear(self.nb_hidden, 20),
-                            nn.ReLU(), 
-                            nn.Linear(20,2)
+                            nn.Linear(self.nb_hidden, 2)
                             )
 
   def forward(self, x):
-    return self.fc(x)
+    return self.fc(x), None, None
 
   def train_model(self, train_input, train_target, test_input, test_target):
     criterion = nn.CrossEntropyLoss()
@@ -48,7 +46,7 @@ class ShallowModel(nn.Module):
     for e in range(self.nb_epochs):
       acc_loss = 0
       for b in range(0, train_input.size(0), self.mini_batch_size):
-        output = self(train_input.narrow(0, b, self.mini_batch_size))
+        output,_,_ = self(train_input.narrow(0, b, self.mini_batch_size))
         loss = criterion(output, train_target.narrow(0, b, self.mini_batch_size))
         self.zero_grad()
         loss.backward()
