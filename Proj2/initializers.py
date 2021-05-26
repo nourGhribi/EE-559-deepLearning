@@ -6,6 +6,7 @@ from initializer import Initializer
 class Xavier(Initializer):
     """
     Weights initializer using xavier and default unifrom distibution (else uses normal distribution)
+    src=https://towardsdatascience.com/weight-initialization-in-neural-networks-a-journey-from-the-basics-to-kaiming-954fb9b47c79
     """
     def __init__(self, fan_in, fan_out, dist = 'uniform'):
         super(Xavier, self).__init__()
