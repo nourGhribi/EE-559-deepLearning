@@ -15,6 +15,26 @@ class ReLU(Module):
         dz_dx = 0.5 * (self.x.sign() + 1)
         dl_dx = dz_dx * dl_dz
         return dl_dx
+    
+class LeakyReLU(Module):
+
+    def __init__(self,negative_slope=0.01):
+        #negative_slope – Controls the angle of the negative slope. Default: 1e-2
+
+        super(LeakyReLU, self).__init__()
+        self.x = None
+        self.negative_slope = negative_slope
+
+    def forward(self,x):
+        self.x = x
+        y = x * self.negative_slope * (x <= 0).float() +  x * (x > 0).float()
+        return y
+
+    def backward(self, dl_dz):
+        dz_dx =  self.negative_slope * (self.x <= 0).float() +  (self.x > 0).float()
+        dl_dx = dz_dx * dl_dz
+        return dl_dx
+
 
 
 class Tanh(Module):
@@ -33,13 +53,7 @@ class Tanh(Module):
 
 
 def sigmoid(x):
-    """
-    The sigmoid function
-    :param x: input
-    :return: sigmoid(X)
-    """
-    s = 1 / (1 + x.mul(-1).exp())
-    return s
+    return 1 / (1 + x.mul(-1).exp())
 
 
 class Sigmoid(Module):

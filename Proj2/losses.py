@@ -22,6 +22,5 @@ class LossMSE(Module):
     def backward(self):
         batchsize = self.prediction.shape[0]
         dMSE = 2*(self.prediction - self.target)/batchsize
-        
         #proagate the loss to the model
         self.model.backward(dMSE)

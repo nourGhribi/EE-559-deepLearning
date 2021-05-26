@@ -1,6 +1,7 @@
 import math
 import torch
 from losses import LossMSE as MSE
+from optimizers import SGD
 
 def get_data(n = 1000):
     """
@@ -32,5 +33,174 @@ def encode_labels(target):
     encoded[:,1] = target
     return encoded
 
-def train_model(model, X_train, y_train, X_test, y_test, epochs=100, batch_size=50, loss="MSE", lr="0.05", verbose=True):
-    raise NotImplementedError
+
+def train_test_model(model, X_train, y_train, X_test, y_test, epochs=150, batch_size=1, loss="MSE", lr=0.01, verbose=True):
+    
+    train_loss = []
+    train_acc = []
+    
+    test_loss = []
+    test_acc = []
+    
+    optimizer = SGD(model=model,lr=lr)
+    
+    criterion = MSE(model=model)
+    
+    number_batches = X_train.size(0) // batch_size
+    
+    
+    for epoch in range(epochs):
+        
+        epoch_train_loss = 0
+        epoch_train_acc = 0
+        
+        epoch_test_loss = 0
+        epoch_test_acc = 0
+        
+        
+        # Train
+        for index in range(0, X_train.size(0), batch_size):
+            
+            X_train_batch = X_train[index:(index+batch_size)]
+            y_train_batch = y_train[index:(index+batch_size)]
+            encoded_y_train_batch = encode_labels(y_train_batch)
+            
+            
+            #forward pass
+            output = model.forward(X_train_batch)
+            
+            loss = criterion.forward(output, encoded_y_train_batch)
+            epoch_train_loss += loss.item() 
+            
+            batch_acc =  (output.max(1)[1].float() == y_train_batch).sum().item()
+            epoch_train_acc += batch_acc
+            
+            # zero the parameter gradients
+            optimizer.zero_grad()
+            #backward pass and update parameters gradient
+            criterion.backward()
+            #update parameters (SGD step)
+            optimizer.step()
+
+        epoch_train_acc = (epoch_train_acc / X_train.size(0)) * 100
+        epoch_train_loss = (epoch_train_loss / number_batches)
+        
+        train_acc.append(epoch_train_acc)
+        train_loss.append(epoch_train_loss)
+        
+        
+        
+        # Test        
+        for index in range(0, X_test.size(0), batch_size):
+            
+            X_test_batch = X_test[index:(index+batch_size)]
+            
+            y_test_batch = y_test[index:(index+batch_size)]
+            encoded_y_test_batch = encode_labels(y_test_batch)
+            
+            #forward pass
+            output = model.forward(X_test_batch)
+            loss = criterion.forward(output, encoded_y_test_batch)
+            epoch_test_loss += loss.item() 
+            
+            batch_acc =  (output.max(1)[1].float() == y_test_batch).sum().item()
+            epoch_test_acc += batch_acc
+            
+
+        epoch_test_acc = (epoch_test_acc / X_test.size(0)) * 100
+        epoch_test_loss = (epoch_test_loss / number_batches)
+        
+        test_acc.append(epoch_test_acc)
+        test_loss.append(epoch_test_loss)
+        
+        if verbose and ((epoch+1) % 5 == 0) or (epoch == 0):
+            print(f"Epoch {epoch+1}: train loss={epoch_train_loss:0.4f}, train acccuracy={epoch_train_acc:0.2f}% | "+\
+                  f"test loss={epoch_test_loss:0.4f}, test acccuracy={epoch_test_acc:0.2f}%")
+            
+    return model, train_loss, train_acc, test_loss, test_acc
+    
+    
+## PyTorch
+            
+def torch_train_test_model(model, X_train, y_train, X_test, y_test, epochs=150, batch_size=1, loss="MSE", lr=0.01, verbose=True):
+    
+    train_loss = []
+    train_acc = []
+    
+    test_loss = []
+    test_acc = []
+    
+    optimizer = torch.optim.SGD(model.parameters(), lr=lr)
+    
+    criterion = torch.nn.MSELoss()
+    
+    number_batches = X_train.size(0) // batch_size
+    
+    
+    for epoch in range(epochs):
+        
+        epoch_train_loss = 0
+        epoch_train_acc = 0
+        
+        epoch_test_loss = 0
+        epoch_test_acc = 0
+        
+        
+        # Train
+        for index in range(0, X_train.size(0), batch_size):
+            
+            X_train_batch = X_train[index:(index+batch_size)]
+            y_train_batch = y_train[index:(index+batch_size)]
+            encoded_y_train_batch = encode_labels(y_train_batch)
+            
+            
+            # forward + backward + optimize
+            outputs = model(X_train_batch)
+            loss = criterion(outputs, encoded_y_train_batch)
+            
+            # zero the parameter gradients
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            
+            epoch_train_loss += loss.item() 
+            
+            batch_acc =  (outputs.max(1)[1].float() == y_train_batch).sum().item()
+            epoch_train_acc += batch_acc
+
+        epoch_train_acc = (epoch_train_acc / X_train.size(0)) * 100
+        epoch_train_loss = (epoch_train_loss / number_batches)
+        
+        train_acc.append(epoch_train_acc)
+        train_loss.append(epoch_train_loss)
+        
+        
+        
+        # Test        
+        for index in range(0, X_test.size(0), batch_size):
+            
+            X_test_batch = X_test[index:(index+batch_size)]
+            y_test_batch = y_test[index:(index+batch_size)]
+            encoded_y_test_batch = encode_labels(y_test_batch)
+            
+            #forward pass
+            outputs = model(X_test_batch)
+            loss = criterion(outputs, encoded_y_test_batch)
+            epoch_test_loss += loss.item() 
+            
+            batch_acc =  (outputs.max(1)[1].float() == y_test_batch).sum().item()
+            epoch_test_acc += batch_acc
+            
+
+        epoch_test_acc = (epoch_test_acc / X_test.size(0)) * 100
+        epoch_test_loss = (epoch_test_loss / number_batches)
+        
+        test_acc.append(epoch_test_acc)
+        test_loss.append(epoch_test_loss)
+        
+        if verbose and ((epoch+1) % 5 == 0) or (epoch == 0):
+            print(f"Epoch {epoch+1}: train loss={epoch_train_loss:0.4f}, train acccuracy={epoch_train_acc:0.2f}% | "+\
+                  f"test loss={epoch_test_loss:0.4f}, test acccuracy={epoch_test_acc:0.2f}%")
+            
+    return model, train_loss, train_acc, test_loss, test_acc
+    

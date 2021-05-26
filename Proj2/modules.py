@@ -39,10 +39,10 @@ class Linear(Module):
         """ 
         Computes a forward pass 
         :param x: (bs, dim_in), with bs the number of data points (the batch size)
-        :return: y = x * W.t+ b with W:(dim_out, dim_in), b:(bs, dim_out) returns y:(bs, dim_out)
+        :return: y = x * W.t + b with W:(dim_out, dim_in), b:(bs, dim_out) returns y:(bs, dim_out)
         """
         self.x = x
-        return self.x.mm(self.w.t()) + self.b if bias else self.x.mm(self.w.t())  #(batch_size, dim_out)
+        return self.x.mm(self.w.t()) + self.b if self.bias else self.x.mm(self.w.t())  #(batch_size, dim_out)
 
         
     def backward(self,dl_dz):  
@@ -58,14 +58,14 @@ class Linear(Module):
         
         # Update gradients
         if self.bias:
-            self.dl_db = dl_dz.sum(0)          #(dim_out, 1)
+            self.dl_db = dl_dz.sum(0)      #(dim_out, 1)
         self.dl_dw = dl_dz.t().mm(self.x)  #(batchsize, dim_out).T *  (batchsize,dim_in)  = (dim_out , dim_in)
   
         return dl_dx   #(batchsize, dim_in)
 
     def param(self):
         """
-        :return: pair of pair of tensors of the weights and their respectif gradients
+        :return: tuple of tensors of the weights and their respectif gradients
         """
         return [(self.w, self.b, self.dl_dw, self.dl_db)] if self.bias else [(self.w, self.dl_dw)]
     
@@ -74,7 +74,7 @@ class Linear(Module):
         Set gradient to 0
         """
         self.dl_dw.zero_()
-        if bias:
+        if self.bias:
             self.dl_db.zero_()
 
 
@@ -101,6 +101,10 @@ class Sequential(Module):
         return grad
 
     def param(self):
+        """
+        List of parameters of each layer
+        [(self.w, self.b, self.dl_dw, self.dl_db)] or [(self.w, self.dl_dw)] if no bias
+        """
         parameters = []
         for layer in self.layers:
             parameters += layer.param()
