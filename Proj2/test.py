@@ -14,7 +14,7 @@ def main():
     HIDDEN_UNITS = 25
     OUTPUT_UNITS = 2
     
-    lr=0.015
+    lr=0.01
     
     X_train, y_train = get_data(1000)
     X_test, y_test = get_data(1000)

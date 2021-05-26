@@ -110,7 +110,7 @@ class Sequential(Module):
             parameters += layer.param()
         return parameters
     
-    def __str__(self):
+    def __str__(self):            
         params = self.param()
         out = []
         for layer, weights in enumerate(params):
