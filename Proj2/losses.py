@@ -3,6 +3,9 @@ from module import Module
 class LossMSE(Module):
     
     def __init__(self,model):
+        """
+        :param: the model for which to compute the loss on its output
+        """
         super(LossMSE, self).__init__()
         self.prediction = None
         self.target = None
@@ -10,7 +13,7 @@ class LossMSE(Module):
         
     def forward(self, prediction, target):
         """
-        :param prediction: the predicted values
+        :param prediction: the predicted values using the model
         :param target: the true values
         :return: MSE error over the batch size
         """

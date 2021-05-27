@@ -1,6 +1,5 @@
 from module import Module
 
-
 class ReLU(Module):
     def __init__(self):
         super(ReLU, self).__init__()
