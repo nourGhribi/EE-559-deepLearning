@@ -32,7 +32,7 @@ parser.add_argument('--data_dir',
                     help = 'Where are the PyTorch data located (default $PYTORCH_DATA_DIR or \'./data\')')
 
 # Timur's fix
-parser.add_argument('-f', '--file',
+parser.add_argument('-f', '--file', '--f',
                     help = 'quick hack for jupyter')
 
 args = parser.parse_args()

@@ -132,3 +132,148 @@ def plot_model_output(trial_train_accuracies, trial_test_accuracies, trial_losse
   axes[1].set_title("{0} loss, over {1} trials.".format(model_name,nb_trials))
   axes[1].grid()
   axes[1].legend()
+
+
+
+def plot_hyperparameters_output(trial_train_accuracies_list, trial_test_accuracies_list, trial_losses_list, model_name, hyperparameter_name, hyperparameter_values):
+  """
+  This method plots the train and test accuracies of a certain model as well as
+  its respective losses with respect to a list of values of a certain hyperparameter.
+
+  Parameters
+  ----------
+  trial_train_accuracies_list : list of torch.tensor[nb_trials,nb_epoch]
+    list of 2d tensors with train accuracies.
+  trial_test_accuracies_list : list of torch.tensor[nb_trials,nb_epoch]
+    list 2d tensors with test accuracies.
+  trial_losses_list : torch.tensor[nb_trials,nb_epoch]
+    list of 2d tensors with losses.
+  model_name : string
+    Nodel name, for plot title.
+  hyperparameter_name : string
+    Name of the hyperparameter.
+  hyperparameter_name : list
+    List of values of the tested hyperparameter.
+  Returns
+  -------
+  None.
+
+  """
+  assert len(trial_train_accuracies_list) == len(trial_test_accuracies_list)
+  assert len(trial_train_accuracies_list) == len(trial_losses_list)
+  assert len(trial_train_accuracies_list) == len(hyperparameter_values)
+
+  fig, axes = plt.subplots(1, 3, figsize=(18, 3))
+
+  for trial_train_accuracies, trial_test_accuracies, trial_losses, param_value in zip(trial_train_accuracies_list, trial_test_accuracies_list, trial_losses_list, hyperparameter_values):
+
+    nb_trials, nb_epoch = trial_train_accuracies.size()
+    trial_train_accuracies_std, trial_train_accuracies_mean = torch.std_mean(trial_train_accuracies, axis = 0)
+    trial_test_accuracies_std, trial_test_accuracies_mean = torch.std_mean(trial_test_accuracies, axis = 0)
+    trial_losses_std, trial_losses_mean = torch.std_mean(trial_losses, axis = 0)
+    
+  
+    ## Accuracies
+    axes[0].plot(range(1,nb_epoch +1),trial_train_accuracies_mean, label="train, val = {}".format(param_value))
+    axes[1].plot(range(1,nb_epoch +1),trial_test_accuracies_mean, label="test, val = {}".format(param_value))
+    axes[0].fill_between(x= range(1,nb_epoch +1),y1= trial_train_accuracies_mean + trial_train_accuracies_std, y2= trial_train_accuracies_mean - trial_train_accuracies_std, alpha = 0.5)
+    axes[1].fill_between(x= range(1,nb_epoch +1), y1= trial_test_accuracies_mean + trial_test_accuracies_std, y2= trial_test_accuracies_mean - trial_test_accuracies_std, alpha = 0.5)
+    
+    ## Losses
+    axes[2].plot(range(1,nb_epoch +1),trial_losses_mean, label="loss, val = {}".format(param_value))
+    axes[2].fill_between(x= range(1,nb_epoch +1),y1= trial_losses_mean + trial_losses_std, y2= trial_losses_mean - trial_losses_std, alpha = 0.5)
+    
+
+
+  axes[0].set_ylim(40,110)
+  axes[0].set_xlim(1,nb_epoch)
+  axes[0].set_xlabel("epoch")
+  axes[0].set_ylabel("accuracy [%]")
+  axes[0].set_title("{0} accuracy for train dataset, \nover {1} trials for different {2} values.".format(model_name,nb_trials,hyperparameter_name))
+  axes[0].grid()
+  axes[0].legend()
+
+  axes[1].set_ylim(40,110)
+  axes[1].set_xlim(1,nb_epoch)
+  axes[1].set_xlabel("epoch")
+  axes[1].set_ylabel("accuracy [%]")
+  axes[1].set_title("{0} accuracy for test dataset, \nover {1} trials for different {2} values.".format(model_name,nb_trials,hyperparameter_name))
+  axes[1].grid()
+  axes[1].legend()
+
+  axes[2].set_xlim(1,nb_epoch)
+  axes[2].set_xlabel("epoch")
+  axes[2].set_ylabel("Loss")
+  axes[2].set_title("{0} loss, \nover {1} trials for different {2} values.".format(model_name,nb_trials,hyperparameter_name))
+  axes[2].grid()
+  axes[2].legend()
+
+
+def compare_model_output(trial_train_accuracies_list, trial_test_accuracies_list, trial_losses_list, model_names):
+  """
+  This method plots the train and test accuracies of a list of models as well as
+  their respective losses.
+
+  Parameters
+  ----------
+  trial_train_accuracies_list : list of torch.tensor[nb_trials,nb_epoch]
+    list of 2d tensors with train accuracies.
+  trial_test_accuracies_list : list of torch.tensor[nb_trials,nb_epoch]
+    list 2d tensors with test accuracies.
+  trial_losses_list : torch.tensor[nb_trials,nb_epoch]
+    list of 2d tensors with losses.
+  model_names : string
+    List of model names, for plot title.
+  Returns
+  -------
+  None.
+
+  """
+  assert len(trial_train_accuracies_list) == len(trial_test_accuracies_list)
+  assert len(trial_train_accuracies_list) == len(trial_losses_list)
+  assert len(trial_train_accuracies_list) == len(model_names)
+
+  fig, axes = plt.subplots(1, 3, figsize=(18, 3))
+
+  for trial_train_accuracies, trial_test_accuracies, trial_losses, model_name in zip(trial_train_accuracies_list, trial_test_accuracies_list, trial_losses_list, model_names):
+
+    nb_trials, nb_epoch = trial_train_accuracies.size()
+    trial_train_accuracies_std, trial_train_accuracies_mean = torch.std_mean(trial_train_accuracies, axis = 0)
+    trial_test_accuracies_std, trial_test_accuracies_mean = torch.std_mean(trial_test_accuracies, axis = 0)
+    trial_losses_std, trial_losses_mean = torch.std_mean(trial_losses, axis = 0)
+    
+  
+    ## Accuracies
+    axes[0].plot(range(1,nb_epoch +1),trial_train_accuracies_mean, label="train, {}".format(model_name))
+    axes[1].plot(range(1,nb_epoch +1),trial_test_accuracies_mean, label="test, {}".format(model_name))
+    axes[0].fill_between(x= range(1,nb_epoch +1),y1= trial_train_accuracies_mean + trial_train_accuracies_std, y2= trial_train_accuracies_mean - trial_train_accuracies_std, alpha = 0.5)
+    axes[1].fill_between(x= range(1,nb_epoch +1), y1= trial_test_accuracies_mean + trial_test_accuracies_std, y2= trial_test_accuracies_mean - trial_test_accuracies_std, alpha = 0.5)
+    
+    ## Losses
+    axes[2].plot(range(1,nb_epoch +1),trial_losses_mean, label="loss, {}".format(model_name))
+    axes[2].fill_between(x= range(1,nb_epoch +1),y1= trial_losses_mean + trial_losses_std, y2= trial_losses_mean - trial_losses_std, alpha = 0.5)
+    
+
+
+  axes[0].set_ylim(50,110)
+  axes[0].set_xlim(1,nb_epoch)
+  axes[0].set_xlabel("epoch")
+  axes[0].set_ylabel("accuracy [%]")
+  axes[0].set_title("Aaccuracy for train datasets, \nover {1} trials for different models.".format(model_name,nb_trials))
+  axes[0].grid()
+  axes[0].legend()
+
+  axes[1].set_ylim(50,110)
+  axes[1].set_xlim(1,nb_epoch)
+  axes[1].set_xlabel("epoch")
+  axes[1].set_ylabel("accuracy [%]")
+  axes[1].set_title("Accuracy for test datasets, \nover {1} trials for different models.".format(model_name,nb_trials))
+  axes[1].grid()
+  axes[1].legend()
+
+  axes[2].set_xlim(1,nb_epoch)
+  axes[2].set_xlabel("epoch")
+  axes[2].set_ylabel("Loss")
+  axes[2].set_title("Losses, over {1} trials \nfor different models.".format(model_name,nb_trials))
+  axes[2].grid()
+  axes[2].legend()
