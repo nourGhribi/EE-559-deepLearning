@@ -5,8 +5,8 @@ from optimizers import SGD
 
 def get_data(n=1000):
     """
-    Returns train and test data x, y each having n points sampled uniformly in [0, 1]^2,
-    each with a label 0 if outside the disk centered at (0.5, 0.5) of radius 1/√2π, and 1 if inside.
+    Returns (x, label) n data points with x sampled uniformly in [0, 1]^2,
+    each with a label 1 if outside the disk centered at (0.5, 0.5) of radius 1/√2π, and 0 if inside.
     :param n: Number of data points
     :return: data, labels
     """

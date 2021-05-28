@@ -4,7 +4,6 @@ from initializers import Xavier
 
 class Linear(Module):
     """ Fully connected layer
-        Y = X * W + b.
         Parameters : dim_in and dim_out
     """
     def __init__(self, dim_in, dim_out, bias=True, w=None, b=None):
