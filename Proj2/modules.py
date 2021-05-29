@@ -2,6 +2,7 @@ import torch
 from module import Module
 from initializers import Xavier
 
+
 class Linear(Module):
     """ Fully connected layer
         Parameters : dim_in and dim_out
