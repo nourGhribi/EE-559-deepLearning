@@ -15,7 +15,6 @@ def get_data(n=1000):
 
     x_centered = x - 0.5
     norm_squared = x_centered.pow(2).sum(dim=1)
-
     radius_sq = 1 / (2 * math.pi)
 
     # To check if the points are inside the disk
