@@ -1,4 +1,4 @@
-# EE-559-deepLearning2021
+# Deep Learning Projects
 ## Project 1 – Classification, weight sharing, auxiliary losses
 This  section  details  our  approach  to  compare  twodigits  of  a  pair  of  two-channel  images  from  the  MNIST  data.The  goal  of  this  project  is  to  compare  the  accuracy  of  differentarchitectures and assess the performance improvement that canbe achieved through models with shared weights and the use of anauxiliary loss. The performance of each of these different modelswill  be  estimated  on  a  test  data  through  10  rounds  where  bothdata  and  weight  initialization  are  randomized  at  each  trainin
   * `models.py` contains the class definition of the different models we implemented.
